@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <resources>
+        <!-- *** ADD *** -->
+        <string name="client_id">XC5DfIRVXdBYw28f</string>
+        <string name="redirect_uri">my-devlab-app://auth</string>
+    </resources>
