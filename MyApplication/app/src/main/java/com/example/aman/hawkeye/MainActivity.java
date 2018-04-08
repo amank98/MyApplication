@@ -1,17 +1,20 @@
 package com.example.aman.hawkeye;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-
 
 import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Point;
@@ -30,12 +33,12 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LocationListener {
     private FusedLocationProviderClient mFusedLocationClient;
 
 
     private MapView mMapView;
-
+    private LocationManager locationManager;
 
 
     @Override
@@ -45,48 +48,54 @@ public class MainActivity extends AppCompatActivity {
         Button button = (Button) findViewById(R.id.incidentBtn);
         mMapView = findViewById(R.id.mapView);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.d("button", "Permission there");
-            mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
-                                Log.d("button", "in here");
-                                GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
-                                mMapView.getGraphicsOverlays().add(graphicsOverlay);
-                                SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 12);
-                                Point graphicPoint = new Point(38.994984, -76.940491, SpatialReferences.getWebMercator());
-                                Graphic graphic = new Graphic(graphicPoint, symbol);
-                                graphicsOverlay.getGraphics().add(graphic);
-                            }
-                            else {
-                                Log.d("button", "location is null");
-                            }
-                        }
-                    });
 
-            mFusedLocationClient.getLastLocation().addOnFailureListener(this, new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d("button", "failed to get location");
-                    GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
-                    mMapView.getGraphicsOverlays().add(graphicsOverlay);
-                    SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 12);
-                    Point graphicPoint = new Point(38.994984, -76.940491, SpatialReferences.getWgs84());
+//        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 50, (LocationListener) this);
+//        }
 
-
-
-
-                    Graphic graphic = new Graphic(graphicPoint, symbol);
-                    graphicsOverlay.getGraphics().add(graphic);
-                }
-            });
-        }
-        else {
-            Log.d("Button", "No Permissions");
-        }
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            Log.d("button", "Permission there");
+//            mFusedLocationClient.getLastLocation()
+//                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+//                        @Override
+//                        public void onSuccess(Location location) {
+//                            // Got last known location. In some rare situations this can be null.
+//                            if (location != null) {
+//                                Log.d("button", "in here");
+//                                GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
+//                                mMapView.getGraphicsOverlays().add(graphicsOverlay);
+//                                SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 12);
+//                                Point graphicPoint = new Point(38.994984, -76.940491, SpatialReferences.getWebMercator());
+//                                Graphic graphic = new Graphic(graphicPoint, symbol);
+//                                graphicsOverlay.getGraphics().add(graphic);
+//                            }
+//                            else {
+//                                Log.d("button", "location is null");
+//                            }
+//                        }
+//                    });
+//
+//            mFusedLocationClient.getLastLocation().addOnFailureListener(this, new OnFailureListener() {
+//                @Override
+//                public void onFailure(@NonNull Exception e) {
+//                    Log.d("button", "failed to get location");
+//                    GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
+//                    mMapView.getGraphicsOverlays().add(graphicsOverlay);
+//                    SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 12);
+//                    Point graphicPoint = new Point(38.994984, -76.940491, SpatialReferences.getWgs84());
+//
+//
+//
+//
+//                    Graphic graphic = new Graphic(graphicPoint, symbol);
+//                    graphicsOverlay.getGraphics().add(graphic);
+//                }
+//            });
+//        }
+//        else {
+//            Log.d("Button", "No Permissions");
+//        }
 
 
         ArcGISMap map = new ArcGISMap(Basemap.Type.TOPOGRAPHIC, 38.994984, -76.940491, 16);
@@ -94,22 +103,42 @@ public class MainActivity extends AppCompatActivity {
         map.getOperationalLayers().add(censusLayer);
 
 
-        GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
-        mMapView.getGraphicsOverlays().add(graphicsOverlay);
+        mMapView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getDownTime() >= 2000) {
+                    GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
+                    mMapView.getGraphicsOverlays().add(graphicsOverlay);
+                    SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 12);
+                    Point p = mMapView.screenToLocation(new android.graphics.Point((int)motionEvent.getX(), (int)motionEvent.getY()));
+                    Point graphicPoint = new Point(p.getX(), p.getY());
+
+                    Graphic graphic = new Graphic(graphicPoint, symbol);
+                    graphicsOverlay.getGraphics().add(graphic);
+                    Log.d("button", "added");
+                }
+                return true;
+            }
+        });
+
+//        GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
+//        mMapView.getGraphicsOverlays().add(graphicsOverlay);
+//
+//
+//
+//
+//        SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 12);
+//        Point graphicPoint = new Point(38.994984, -76.940491, SpatialReferences.getWebMercator());
+//        Point wgsPoint  = new Point(-76.940491, 38.994984);
+//        Point myPoint = (Point) GeometryEngine.project(wgsPoint, SpatialReferences.getWgs84());
+//
+//
+//
+////        Graphic graphic = new Graphic(graphicPoint, symbol);
+//        Graphic graphic = new Graphic(myPoint, symbol);
+//        graphicsOverlay.getGraphics().add(graphic);
 
 
-
-
-        SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 12);
-        Point graphicPoint = new Point(38.994984, -76.940491, SpatialReferences.getWebMercator());
-        Point wgsPoint  = new Point(38.994984, -76.940491);
-        Point myPoint = (Point) GeometryEngine.project(wgsPoint, map.getSpatialReference());
-
-
-
-//        Graphic graphic = new Graphic(graphicPoint, symbol);
-        Graphic graphic = new Graphic(myPoint, symbol);
-        graphicsOverlay.getGraphics().add(graphic);
 
         mMapView.setMap(map);
 
@@ -118,8 +147,18 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.d("button", "Button clicked");
                 if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    mFusedLocationClient.getLastLocation();
-
+//                    mFusedLocationClient.getLastLocation();
+                    Location loc = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
+                    if (loc != null) {
+                        SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 12);
+                        Point graphicPoint = new Point(38.994984, -76.940491, SpatialReferences.getWebMercator());
+                        Point wgsPoint  = new Point(-76.940491, 38.994984);
+                        Point myPoint = (Point) GeometryEngine.project(wgsPoint, SpatialReferences.getWgs84());
+                        GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
+                        mMapView.getGraphicsOverlays().add(graphicsOverlay);
+                        Graphic graphic = new Graphic(myPoint, symbol);
+                        graphicsOverlay.getGraphics().add(graphic);
+                    }
                 }
             }
         });
@@ -135,5 +174,25 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume(){
         super.onResume();
         mMapView.resume();
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Log.d("LOC", "DISABLED");
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Log.d("LOC", "ENABLED");
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        Log.d("LOC", "CHANGED");
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
     }
 }
