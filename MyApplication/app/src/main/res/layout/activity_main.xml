@@ -1,26 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.aman.hawkeye.MainActivity">
 
     <com.esri.arcgisruntime.mapping.view.MapView
         android:id="@+id/mapView"
-        android:layout_width="0dp"
+        android:layout_width="362dp"
         android:layout_height="0dp"
-        tools:layout_constraintTop_creator="1"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintBottom_creator="1"
-        android:layout_marginStart="8dp"
+        android:layout_weight="1"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:layout_constraintLeft_creator="1"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-    </com.esri.arcgisruntime.mapping.view.MapView>
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1"></com.esri.arcgisruntime.mapping.view.MapView>
 
+
+    <Button
+        android:id="@+id/incidentBtn"
+        android:layout_width="match_parent"
+        android:layout_height="51dp"
+        android:background="#e60000"
+        android:fontFamily="sans-serif-condensed"
+        android:text="Report Incident"
+        android:textAppearance="@style/TextAppearance.AppCompat.Button"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:onClick="showPopup"
+
+        />
+
+    <menu xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:id="@+id/unarm_rob"
+            android:title="@string/Unarmed Robbery"
+            android:showAsAction="ifRoom"/>
+        <item android:id="@+id/arm_rob"
+            android:title="@string/Armed Robbery" />
+    </menu>
 </android.support.constraint.ConstraintLayout>
