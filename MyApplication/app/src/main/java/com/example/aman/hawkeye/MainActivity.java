@@ -9,8 +9,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.PopupMenu;
 
 
 import com.esri.arcgisruntime.geometry.GeometryEngine;
@@ -35,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private MapView mMapView;
-
+    PopupMenu popupMenu;
+    boolean clicked = false;
 
 
     @Override
@@ -43,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button button = (Button) findViewById(R.id.incidentBtn);
+        popupMenu = new PopupMenu(this,findViewById(R.id.incidentBtn));
+
+
         mMapView = findViewById(R.id.mapView);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -101,10 +109,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 12);
-        Point graphicPoint = new Point(38.994984, -76.940491, SpatialReferences.getWebMercator());
-        Point wgsPoint  = new Point(38.994984, -76.940491);
-        Point myPoint = (Point) GeometryEngine.project(wgsPoint, map.getSpatialReference());
-
+//        Point graphicPoint = new Point(38.994984, -76.940491, SpatialReferences.getWebMercator());
+        Point wgsPoint  = new Point(-76.940491, 38.994984);
+        Point myPoint = (Point) GeometryEngine.project(wgsPoint, SpatialReferences.getWgs84());
 
 
 //        Graphic graphic = new Graphic(graphicPoint, symbol);
@@ -116,13 +123,50 @@ public class MainActivity extends AppCompatActivity {
         //Button action
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Log.d("button", "Button clicked");
-                if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    mFusedLocationClient.getLastLocation();
 
+                showPopup(v);
+                clicked = true;
+//                Log.d("button", "Button clicked");
+//                if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                    mFusedLocationClient.getLastLocation();
+//
+//                }
+            }
+        });
+
+        //Popup menu item action
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+                switch(id) {
+                    case R.id.unarm_rob:
+                        Log.d("ok","unarmed robbery reported");
+                        return true;
+                    case R.id.arm_rob:
+                        Log.d("ok","armed robbery reported");
+                        return true;
+                    default:
+                        return false;
                 }
             }
         });
+
+
+    }
+
+    //Popup menu
+    public void showPopup(View v) {
+        if (!clicked) {
+            MenuInflater inflater = popupMenu.getMenuInflater();
+            inflater.inflate(R.menu.incidentmenu, popupMenu.getMenu());
+        }
+        popupMenu.show();
+    }
+
+    //Add point to map once incident is selected
+    public void addPoint() {
+        Log.d("popupmenu","We clicked!");
     }
 
     @Override

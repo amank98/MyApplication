@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ourMenu"
+    android:layout_width="fill_parent">
+
+    <item
+        android:id="@+id/assault"
+        android:title="Assault" />
+    <item
+        android:id="@+id/arm_rob"
+        android:title="Armed Robbery" />
+    <item
+        android:id="@+id/unarm_rob"
+        android:title="Unarmed Robbery" />
+
+</menu>
+
