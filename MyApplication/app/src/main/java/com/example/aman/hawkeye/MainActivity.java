@@ -46,6 +46,7 @@ import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.security.AuthenticationManager;
 import com.esri.arcgisruntime.security.DefaultAuthenticationChallengeHandler;
 import com.esri.arcgisruntime.security.OAuthConfiguration;
+import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 
 
@@ -102,11 +103,10 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                if (crtPt == false) {
-                    showPopup(v);
-                    clicked = true;
-                    crtPt = true;
-                }
+                showPopup(v);
+                clicked = true;
+                crtPt = true;
+
 //
             }
         });
@@ -121,17 +121,23 @@ public class MainActivity extends AppCompatActivity {
                 button.setText("Select a location");
                 switch(id) {
                     case R.id.t1:
+                        currColor = Color.argb(255, 133, 231, 242 ); //(low level incident)
+                        crtPt = true;
+                        return true;
                     case R.id.t2:
-                        currColor = Color.argb(255, 255, 239, 25 ); //(low level incident)
+                        currColor = Color.argb(255, 0, 158, 216 ); //(low level incident)
                         crtPt = true;
                         return true;
                     case R.id.t4:
+                        currColor = Color.argb(255, 255, 173, 200 ); //(low level incident)
+                        crtPt = true;
+                        return true;
                     case R.id.t3:
-                        currColor = Color.argb(255,255, 133, 20);
+                        currColor = Color.argb(255,255, 110, 38);
                         crtPt = true; //(mid level incident)
                         return true;
                     case R.id.t5:
-                        currColor = Color.argb(255, 252,49, 22);
+                        currColor = Color.argb(255, 242,179, 33);
                         crtPt = true; //(high level incident)
                         return true;
                     default:
@@ -165,7 +171,11 @@ public class MainActivity extends AppCompatActivity {
             if (crtPt) {
                 GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
                 mMapView.getGraphicsOverlays().add(graphicsOverlay);
-                SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, currColor, 20);
+                SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.argb(0,0,0,0), 20);
+                SimpleLineSymbol sim = new SimpleLineSymbol();
+                sim.setColor(currColor);
+                sim.setWidth(2);
+                symbol.setOutline(sim);
 
                 Point p = mMapView.screenToLocation(new android.graphics.Point((int) motionEvent.getX(), (int) motionEvent.getY()));
                 Point graphicPoint = new Point(p.getX(), p.getY());

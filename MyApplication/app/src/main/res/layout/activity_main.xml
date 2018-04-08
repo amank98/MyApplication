@@ -8,7 +8,7 @@
 
     <com.esri.arcgisruntime.mapping.view.MapView
         android:id="@+id/mapView"
-        android:layout_width="362dp"
+        android:layout_width="450dp"
         android:layout_height="0dp"
         android:layout_weight="1"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -25,12 +25,13 @@
         android:id="@+id/incidentBtn"
         android:layout_width="match_parent"
         android:layout_height="51dp"
-        android:background="#b7dcec"
+        android:background="#114054"
         android:fontFamily="sans-serif-condensed"
         android:text="Report Incident"
         android:textAppearance="@style/TextAppearance.AppCompat.Button"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
 
         />
