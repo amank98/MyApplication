@@ -1,8 +1,8 @@
 package com.example.aman.hawkeye;
 
-import android.Manifest;
+//import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
+//import android.content.pm.PackageManager;
 
 //import android.Manifest;
 /*import android.content.pm.PackageManager;
@@ -13,38 +13,46 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;*/
+//import android.graphics.Color;
+//import android.location.Location;
+//import android.support.v4.content.ContextCompat;
 import android.graphics.Color;
-import android.location.Location;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.Menu;
+//import android.view.GestureDetector;
+//import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+//import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Button;
 import android.widget.PopupMenu;
 
-import com.esri.arcgisruntime.geometry.GeometryEngine;
-import com.esri.arcgisruntime.geometry.Point;
-import com.esri.arcgisruntime.geometry.SpatialReference;
-import com.esri.arcgisruntime.geometry.SpatialReferences;
-import com.esri.arcgisruntime.layers.ArcGISMapImageLayer;
+import com.esri.arcgisruntime.concurrent.ListenableFuture;
+//import com.esri.arcgisruntime.geometry.GeometryEngine;
+//import com.esri.arcgisruntime.geometry.Point;
+//import com.esri.arcgisruntime.geometry.SpatialReference;
+//import com.esri.arcgisruntime.geometry.SpatialReferences;
+//import com.esri.arcgisruntime.layers.ArcGISMapImageLayer;
 
 /*import android.util.Log;
 import android.view.View;*/ //maybe this??
-import android.widget.Button;
+//import android.widget.Button;
+import android.widget.Toast;
 
 //import com.esri.arcgisruntime.layers.ArcGISMapImageLayer;
 //import com.esri.arcgisruntime.layers.Layer;
 //import com.esri.arcgisruntime.loadable.LoadStatus;
+import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 //import com.esri.arcgisruntime.mapping.Basemap;
+import com.esri.arcgisruntime.mapping.view.DefaultMapViewOnTouchListener;
 import com.esri.arcgisruntime.mapping.view.Graphic;
+//import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
+import com.esri.arcgisruntime.mapping.view.IdentifyGraphicsOverlayResult;
 import com.esri.arcgisruntime.mapping.view.MapView;
 //import com.esri.arcgisruntime.portal.Portal;
 //import com.esri.arcgisruntime.portal.PortalUser;
@@ -52,6 +60,7 @@ import com.esri.arcgisruntime.security.AuthenticationManager;
 import com.esri.arcgisruntime.security.DefaultAuthenticationChallengeHandler;
 import com.esri.arcgisruntime.security.OAuthConfiguration;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
+//import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 /*import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.Point;*/
 //import com.esri.arcgisruntime.geometry.SpatialReference;
@@ -69,8 +78,10 @@ import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;*/
 //import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.net.MalformedURLException;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends AppCompatActivity implements GestureDetector.OnDoubleTapListener {
+public class MainActivity extends AppCompatActivity {
     //private FusedLocationProviderClient mFusedLocationClient;
 
 
@@ -78,21 +89,6 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     PopupMenu popupMenu;
     private boolean clicked = false;
     private boolean crtPt = false;
-
-    final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
-        public void onLongPress(MotionEvent motionEvent) {
-            GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
-            mMapView.getGraphicsOverlays().add(graphicsOverlay);
-            SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 12);
-            Point p = mMapView.screenToLocation(new android.graphics.Point((int)motionEvent.getX(), (int)motionEvent.getY()));
-            Point graphicPoint = new Point(p.getX(), p.getY());
-
-            Graphic graphic = new Graphic(graphicPoint, symbol);
-            graphicsOverlay.getGraphics().add(graphic);
-            Log.d("button", "added");
-        }
-    });
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,17 +134,109 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
         mMapView = findViewById(R.id.mapView);
 
-        mMapView.setOnLongClickListener(new MapView.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-
-                return true;
-            }
-        });
-
         showWebMap();
 
+        MapViewTouchListener mMapViewTouchListener = new MapViewTouchListener(this, mMapView);
+        mMapView.setOnTouchListener(mMapViewTouchListener);
 
+//        mMapView.setOnTouchListener(new MapView.OnTouchListener() {
+//            @Override
+//            public boolean onMultiPointerTap(MotionEvent motionEvent) {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onDoubleTouchDrag(MotionEvent motionEvent) {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onUp(MotionEvent motionEvent) {
+//
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onRotate(MotionEvent motionEvent, double v) {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onDoubleTap(MotionEvent motionEvent) {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onDoubleTapEvent(MotionEvent motionEvent) {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onDown(MotionEvent motionEvent) {
+//                return false;
+//            }
+//
+//            @Override
+//            public void onShowPress(MotionEvent motionEvent) {
+//
+//            }
+//
+//            @Override
+//            public boolean onSingleTapUp(MotionEvent motionEvent) {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+//                return false;
+//            }
+//
+//            @Override
+//            public void onLongPress(MotionEvent motionEvent) {
+//
+//            }
+//
+//            @Override
+//            public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onScale(ScaleGestureDetector scaleGestureDetector) {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onScaleBegin(ScaleGestureDetector scaleGestureDetector) {
+//                return false;
+//            }
+//
+//            @Override
+//            public void onScaleEnd(ScaleGestureDetector scaleGestureDetector) {
+//
+//            }
+//
+//            @Override
+//            public boolean onTouch(View view, MotionEvent motionEvent) {
+////                GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
+////                mMapView.getGraphicsOverlays().add(graphicsOverlay);
+////                SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 12);
+////                Point p = mMapView.screenToLocation(new android.graphics.Point((int)motionEvent.getX(), (int)motionEvent.getY()));
+////                Point graphicPoint = new Point(p.getX(), p.getY());
+////
+////                Graphic graphic = new Graphic(graphicPoint, symbol);
+////                graphicsOverlay.getGraphics().add(graphic);
+////                Log.d("button", "added");
+//                return false;
+//            }
+//        });
+
+//
 //        mMapView.setOnTouchListener(new MapView.OnTouchListener() {
 //            @Override
 //            public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -163,11 +251,11 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 //                    Graphic graphic = new Graphic(graphicPoint, symbol);
 //                    graphicsOverlay.getGraphics().add(graphic);
 //                    Log.d("button", "added");
+//                    return true;
 //                }
 //                else {
-//
+//                    return false;
 //                }
-//                return true;
 //            }
 //        });
 
@@ -317,6 +405,8 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             }
         });
 
+
+
         //Popup menu item action
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
@@ -336,6 +426,56 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         });
 
 
+    }
+
+
+    class MapViewTouchListener extends DefaultMapViewOnTouchListener {
+
+        /**
+         * Constructs a DefaultMapViewOnTouchListener with the specified Context and MapView.
+         *
+         * @param context the context from which this is being created
+         * @param mapView the MapView with which to interact
+         */
+        public MapViewTouchListener(Context context, MapView mapView){
+            super(context, mapView);
+        }
+
+        /**
+         * Override the onSingleTapConfirmed gesture to handle tapping on the MapView
+         * and detected if the Graphic was selected.
+         *
+         * @return true if the listener has consumed the event; false otherwise
+         */
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
+            // get the screen point where user tapped
+
+            // identify graphics on the graphics overlay
+            GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
+                    mMapView.getGraphicsOverlays().add(graphicsOverlay);
+                    SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 12);
+                    Point p = mMapView.screenToLocation(new android.graphics.Point((int)motionEvent.getX(), (int)motionEvent.getY()));
+                    Point graphicPoint = new Point(p.getX(), p.getY());
+
+                    Graphic graphic = new Graphic(graphicPoint, symbol);
+                    graphicsOverlay.getGraphics().add(graphic);
+                    Log.d("button", "added");
+
+            return super.onSingleTapConfirmed(motionEvent);
+        }
+
+    }
+
+
+
+
+    private void showWebMap() {
+        String itemId = "48aa410a6d7b497d9479f3a197d8a889";
+        String url = "https://www.arcgis.com/sharing/rest/content/items/" + itemId + "/data";
+        ArcGISMap map = new ArcGISMap(url);
+
+        mMapView.setMap(map);
     }
 
     //Popup menu
@@ -373,46 +513,18 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         //map.getOperationalLayers().add(crimeLayer);
     }
 
-    private void showWebMap() {
-        String itemId = "48aa410a6d7b497d9479f3a197d8a889";
-        String url = "https://www.arcgis.com/sharing/rest/content/items/" + itemId + "/data";
-        ArcGISMap map = new ArcGISMap(url);
-
-        mMapView.setMap(map);
-    }
-
-    @Override
-    public boolean onDoubleTap(MotionEvent motionEvent) {
-        GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
-        mMapView.getGraphicsOverlays().add(graphicsOverlay);
-        SimpleMarkerSymbol symbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, Color.RED, 12);
-        Point p = mMapView.screenToLocation(new android.graphics.Point((int)motionEvent.getX(), (int)motionEvent.getY()));
-        Point graphicPoint = new Point(p.getX(), p.getY());
-
-        Graphic graphic = new Graphic(graphicPoint, symbol);
-        graphicsOverlay.getGraphics().add(graphic);
-        Log.d("button", "added");
-        return true;
-    }
+//    @Override
+//    public void onShowPress(MotionEvent motionEvent) {
+//        super.onShowPress(motionEvent);
+//    }
+//
+//    @Override
+//    public void onLongPress(MotionEvent motionEvent) {
+//
+//        super.onLongPress(motionEvent);
+//    }
 
 
-    @Override
-    public boolean onSingleTapConfirmed(MotionEvent event) {
-
-        return false;
-    }
-
-    @Override
-    public boolean onDoubleTapEvent(MotionEvent event) {
-
-        return true;
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        gestureDetector.onTouchEvent(event);
-        return super.dispatchTouchEvent(event);
-    }
 
     @Override
     protected void onPause(){
