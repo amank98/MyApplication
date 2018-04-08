@@ -6,14 +6,20 @@
     android:layout_width="fill_parent">
 
     <item
-        android:id="@+id/assault"
+        android:id="@+id/t1"
+        android:title="Car Accident" />
+    <item
+        android:id="@+id/t2"
         android:title="Assault" />
     <item
-        android:id="@+id/arm_rob"
-        android:title="Armed Robbery" />
+        android:id="@+id/t3"
+        android:title="Burglary" />
     <item
-        android:id="@+id/unarm_rob"
-        android:title="Unarmed Robbery" />
+        android:id="@+id/t4"
+        android:title="Breaking and Entering" />
+    <item
+        android:id="@+id/t5"
+        android:title="Armed Gunman" />
 
 </menu>
 
